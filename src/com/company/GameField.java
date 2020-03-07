@@ -2,8 +2,7 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.Random;
 
 public class GameField extends JPanel implements ActionListener {
@@ -26,7 +25,7 @@ public class GameField extends JPanel implements ActionListener {
         setBackground(Color.BLACK);
         loadImages();
         initGames();
-//        addKeyListener();
+        addKeyListener(new FieldKeyListener());
         setFocusable(true);
     }
 
@@ -38,6 +37,7 @@ public class GameField extends JPanel implements ActionListener {
         }
         timer = new Timer(250, this);
         timer.start();
+        createApple();
     }
 
     private void loadImages() {
@@ -45,6 +45,21 @@ public class GameField extends JPanel implements ActionListener {
         apple = iia.getImage();
         ImageIcon iid = new ImageIcon("dot.png");
         dot = iid.getImage();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (inGame){
+            g.drawImage(apple, appleX, appleY, this);
+            for (int i = 0; i < dots; i++) {
+                g.drawImage(dot, x[i], y[i], this);
+            }
+        } else {
+            String end = "Game Over";
+            g.setColor(Color.WHITE);
+            g.drawString(end, SIZE/2, SIZE/2);
+        }
     }
 
     @Override
@@ -99,5 +114,33 @@ public class GameField extends JPanel implements ActionListener {
     private void createApple() {
         appleX = new Random().nextInt(20)*16;
         appleY = new Random().nextInt(20)*16;
+    }
+
+    class FieldKeyListener extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            super.keyPressed(e);
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_LEFT && !right){
+                left = true;
+                up = false;
+                down = false;
+            }
+            if (key == KeyEvent.VK_RIGHT && !left){
+                right = true;
+                up = false;
+                down = false;
+            }
+            if (key == KeyEvent.VK_UP && !down){
+                left = false;
+                up = true;
+                right = false;
+            }
+            if (key == KeyEvent.VK_DOWN && !up){
+                left = false;
+                down = true;
+                right = false;
+            }
+        }
     }
 }
